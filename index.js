@@ -3,35 +3,32 @@ var http = require('http');
 var MobProxy = function(cfg) {
     this.host = (cfg && cfg.host) ? cfg.host : 'localhost';
     this.port = (cfg && cfg.port) ? cfg.port : '8080';
-
-    //TODO: add browsermob-proxy config parameters here
-
     this.debug = (cfg && cfg.debug) ? cfg.debug : false;
 }
 
 MobProxy.prototype = {
-    getProxyList: function() {
-        return this.call('GET', '/proxy', null);
+    getProxyList: function(callback) {
+        this.call('GET', '/proxy', null, callback);
     },
 
     startPort: function(port) {
         this.call('PUT', '/proxy', 'port=' + port);
     },
 
-    stopPort: function(port) {
-        this.call('DELETE', '/proxy/' + port, null);
+    stopPort: function(port, callback) {
+        this.call('DELETE', '/proxy/' + port, null, callback);
     },
 
-    createHAR: function(port, cfg) {
-        return this.call('PUT', '/proxy/' + port + '/har', parameterize(cfg));
+    createHAR: function(port, cfg, callback) {
+        this.call('PUT', '/proxy/' + port + '/har', parameterize(cfg), callback);
     },
 
     startNewPage: function(port, pageRef) {
         this.call('PUT', '/proxy/' + port + '/har/pageRef', pageRef ? pageRef : '');
     },
 
-    getHAR: function(port) {
-        return this.call('GET', '/proxy/' + port + '/har', null);
+    getHAR: function(port, callback) {
+        this.call('GET', '/proxy/' + port + '/har', null, callback);
     },
 
     limit: function(port, cfg) {
@@ -43,7 +40,7 @@ MobProxy.prototype = {
     },
 
     clearURLWhiteList: function(port) {
-        this.call('DELETE', '/proxy/' + port + '/whitelist', null);
+        this.call('DELETE', '/proxy/' + port + '/whitelist');
     },
 
     addURLBlackList: function(port, cfg) {
@@ -51,7 +48,7 @@ MobProxy.prototype = {
     },
 
     clearURLBlackList: function(port) {
-        this.call('DELETE', '/proxy/' + port + '/blacklist', null);
+        this.call('DELETE', '/proxy/' + port + '/blacklist');
     },
 
     setHeaders: function(port, json) {
@@ -79,7 +76,7 @@ MobProxy.prototype = {
     },
 
     removeAllURLRedirects: function(port) {
-        this.call('DELETE', '/proxy/' + port + '/rewrite', null);
+        this.call('DELETE', '/proxy/' + port + '/rewrite');
     },
 
     setRetryCount: function(port, retryCount) {
@@ -87,7 +84,7 @@ MobProxy.prototype = {
     },
 
     clearDNSCache: function(port) {
-        this.call('DELETE', '/proxy/' + port + '/dns/cache', null);
+        this.call('DELETE', '/proxy/' + port + '/dns/cache');
     },
 
     addRequestInterceptor: function(port, payload) {
@@ -107,9 +104,8 @@ MobProxy.prototype = {
         return params.join('&');
     },
 
-    call: function(method, url, data) {
+    call: function(method, url, data, callback) {
         var self = this;
-        var response = '';
         var options = {
             host: this.host,
             port: this.port,
@@ -117,27 +113,23 @@ MobProxy.prototype = {
             method: method
         };
 
-        var callback = function(response) {
+        var respCallback = function(response) {
+            var resp = '';
             response.on('data', function(chunk) { 
                 resp += chunk;
             });
 
             response.on('end', function() {
-                if(self.debug) {
-                    console.log(resp);
-                }
+                if(self.debug) { console.log(resp); }
+                if(callback) { callback(resp); }
             });
         }
 
-        var request = http.request(options, callback);
+        var request = http.request(options, respCallback);
         if(data) { request.write(data); }
         request.end();
-
-        return response;
     }
 
 }
 
-module.exports = {
-    MobProxy: MobProxy
-};
+module.exports = MobProxy;

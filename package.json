@@ -1,12 +1,12 @@
 {
-  "name": "node-browsermob-proxy",
+  "name": "browsermob-proxy-api",
   "version": "0.1.0",
   "description": "NodeJS bindings for controlling a browsermob-proxy instance (creating ports, HARs, etc)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["nodejs", "browsermob-proxy", "HAR", "test"],
+  "keywords": ["nodejs", "browsermob-proxy", "API", "HAR", "test"],
   "author": "jmangs",
   "repository": {
       "type": "git",
