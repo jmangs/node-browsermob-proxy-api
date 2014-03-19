@@ -125,7 +125,7 @@ MobProxy.prototype = {
 
             response.on('end', function() {
                 if(self.debug) { console.log(resp); }
-                if(callback != undefined) { callback(resp); }
+                if(callback != undefined) { callback(null, resp); }
             });
         }
 

@@ -17,7 +17,7 @@ var MobProxy = require('browsermob-proxy-api');
 var proxy = new MobProxy({'host':'localhost', 'port': '8080'});
 
 // start listening on port 10800:
-proxy.startPort(10800, function(data) {
+proxy.startPort(10800, function(err, data) {
     // start new HAR report
     proxy.createHAR(10800, { 'initialPageRef': 'foo' });
 });
@@ -25,7 +25,7 @@ proxy.startPort(10800, function(data) {
 
 To get the current HAR from a previously opened port:
 ```javascript
-proxy.getHAR(10800, function(data) {
+proxy.getHAR(10800, function(err, data) {
     console.log(data);
 });
 ```
