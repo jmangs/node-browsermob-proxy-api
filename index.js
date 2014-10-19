@@ -52,15 +52,15 @@ MobProxy.prototype = {
     },
 
     setHeaders: function(port, json, callback) {
-        this.call('POST', '/proxy/' + port + '/headers', json, callback);
+        this.call('POST', '/proxy/' + port + '/headers', json, callback, true);
     },
 
     setDNSLookupOverride: function(port, json, callback) {
-        this.call('POST', '/proxy/' + port + '/hosts', json, callback);
+        this.call('POST', '/proxy/' + port + '/hosts', json, callback, true);
     },
 
     setAuthentication: function(port, domain, json, callback) {
-        this.call('POST', '/proxy/' + port + '/auth/basic/' + domain, json, callback);
+        this.call('POST', '/proxy/' + port + '/auth/basic/' + domain, json, callback, true);
     },
 
     setWaitPeriod: function(port, cfg, callback) {
@@ -104,15 +104,16 @@ MobProxy.prototype = {
         return params.join('&');
     },
 
-    call: function(method, url, data, callback) {
+    call: function(method, url, data, callback, isJson) {
         var self = this;
+	var contentType = isJson ? 'application/json' : 'application/x-www-form-urlencoded';
         var options = {
             host: this.host,
             port: this.port,
             method: method,
             path: url,
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': contentType,
                 'Content-Length': data ? data.length : 0
             }
         };
