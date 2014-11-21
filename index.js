@@ -40,7 +40,7 @@ MobProxy.prototype = {
     },
 
     clearURLWhiteList: function(port, callback) {
-        this.call('DELETE', '/proxy/' + port + '/whitelist', callback);
+        this.call('DELETE', '/proxy/' + port + '/whitelist', null, callback);
     },
 
     addURLBlackList: function(port, cfg, callback) {
@@ -48,7 +48,7 @@ MobProxy.prototype = {
     },
 
     clearURLBlackList: function(port, callback) {
-        this.call('DELETE', '/proxy/' + port + '/blacklist', callback);
+        this.call('DELETE', '/proxy/' + port + '/blacklist', null, callback);
     },
 
     setHeaders: function(port, json, callback) {
@@ -76,7 +76,7 @@ MobProxy.prototype = {
     },
 
     removeAllURLRedirects: function(port, callback) {
-        this.call('DELETE', '/proxy/' + port + '/rewrite', callback);
+        this.call('DELETE', '/proxy/' + port + '/rewrite', null, callback);
     },
 
     setRetryCount: function(port, retryCount, callback) {
@@ -84,7 +84,7 @@ MobProxy.prototype = {
     },
 
     clearDNSCache: function(port, callback) {
-        this.call('DELETE', '/proxy/' + port + '/dns/cache', callback);
+        this.call('DELETE', '/proxy/' + port + '/dns/cache', null, callback);
     },
 
     addRequestInterceptor: function(port, payload, callback) {
