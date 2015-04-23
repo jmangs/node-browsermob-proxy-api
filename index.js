@@ -10,9 +10,10 @@ function parameterize(cfg) {
 }
 
 var MobProxy = function(cfg) {
-    this.host = (cfg && cfg.host) ? cfg.host : 'localhost';
-    this.port = (cfg && cfg.port) ? cfg.port : '8080';
-    this.debug = (cfg && cfg.debug) ? cfg.debug : false;
+    cfg = cfg || {};
+    this.host = cfg.host || 'localhost';
+    this.port = cfg.port || '8080';
+    this.debug = cfg.debug || false;
 };
 
 MobProxy.prototype = {
