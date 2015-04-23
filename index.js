@@ -1,13 +1,18 @@
 var http = require('http');
 
-function parameterize(cfg) {
-    var params = [];
-    for (var key in cfg) {
-        params.push(key + '=' + encodeURIComponent(cfg[key]));
+function formEncode(params) {
+    if (!params) {
+        return '';
     }
-
-    return params.join('&');
+    return Object.keys(params).map(function(key) {
+        var value = params[key] || '';
+        return encodeURIComponent(key) + '=' + encodeURIComponent(value);
+    }).join('&');
 }
+
+var JSON_MIME = 'application/json';
+var JAVASCRIPT_MIME = 'application/javascript';
+var FORM_MIME = 'application/x-www-form-urlencoded';
 
 var MobProxy = function(cfg) {
     cfg = cfg || {};
@@ -18,105 +23,152 @@ var MobProxy = function(cfg) {
 
 MobProxy.prototype = {
     getProxyList: function(callback) {
-        this._call('GET', '/proxy', null, callback);
+        this._get('/proxy', callback);
     },
 
-    startPort: function(port, callback) {
-        this._call('POST', '/proxy', 'port=' + port, callback);
+    startPort: function(params, callback) {
+        if (typeof params === 'number') { // for compatibility with previous interface
+            params = {'port': params.toString()};
+        }
+        this._post('/proxy', formEncode(params), FORM_MIME, callback);
     },
 
     stopPort: function(port, callback) {
-        this._call('DELETE', '/proxy/' + port, null, callback);
+        this._delete('/proxy/' + port, callback);
     },
 
-    createHAR: function(port, cfg, callback) {
-        this._call('PUT', '/proxy/' + port + '/har', parameterize(cfg), callback);
+    createHAR: function(port, params, callback) {
+        this._put('/proxy/' + port + '/har', formEncode(params), FORM_MIME, callback);
     },
 
-    startNewPage: function(port, pageRef, callback) {
-        this._call('PUT', '/proxy/' + port + '/har/pageRef', pageRef ? pageRef : '', callback);
+    startNewPage: function(port, params, callback) {
+        if (typeof params === 'string') { // for compatibility with previous interface
+            params = {'pageRef': params};
+        }
+        this._put('/proxy/' + port + '/har/pageRef', formEncode(params), FORM_MIME, callback);
     },
 
     getHAR: function(port, callback) {
-        this._call('GET', '/proxy/' + port + '/har', null, callback);
+        this._get('/proxy/' + port + '/har', callback);
     },
 
-    limit: function(port, cfg, callback) {
-        this._call('PUT', '/proxy/' + port + '/limit', parameterize(cfg), callback);
+    getLimit: function(port, callback) {
+        this._get('/proxy/' + port + '/limit', callback);
     },
 
-    addURLWhiteList: function(port, cfg, callback) {
-        this._call('PUT', '/proxy/' + port + '/whitelist', parameterize(cfg), callback);
+    setLimit: function(port, params, callback) {
+        this._put('/proxy/' + port + '/limit', formEncode(params), FORM_MIME, callback);
+    },
+
+    limit: this.setLimit,
+
+    getURLWhiteList: function(port, callback) {
+        this._get('/proxy/' + port + '/whitelist', callback);
+    },
+
+    addURLWhiteList: function(port, params, callback) {
+        this._put('/proxy/' + port + '/whitelist', formEncode(params), FORM_MIME, callback);
     },
 
     clearURLWhiteList: function(port, callback) {
-        this._call('DELETE', '/proxy/' + port + '/whitelist', null, callback);
+        this._delete('/proxy/' + port + '/whitelist', callback);
     },
 
-    addURLBlackList: function(port, cfg, callback) {
-        this._call('PUT', '/proxy/' + port + '/blacklist', parameterize(cfg), callback);
+    getURLBlackList: function(port, callback) {
+        this._get('/proxy/' + port + '/blacklist', callback);
+    },
+
+    addURLBlackList: function(port, params, callback) {
+        this._put('/proxy/' + port + '/blacklist', formEncode(params), FORM_MIME, callback);
     },
 
     clearURLBlackList: function(port, callback) {
-        this._call('DELETE', '/proxy/' + port + '/blacklist', null, callback);
+        this._delete('/blacklist', callback);
     },
 
     setHeaders: function(port, json, callback) {
-        this._call('POST', '/proxy/' + port + '/headers', json, callback, true);
+        if (typeof json === 'object') {
+            json = JSON.stringify(json);
+        }
+        this._post('/proxy/' + port + '/headers', json, JSON_MIME, callback);
     },
 
     setDNSLookupOverride: function(port, json, callback) {
-        this._call('POST', '/proxy/' + port + '/hosts', json, callback, true);
+        if (typeof json === 'object') {
+            json = JSON.stringify(json);
+        }
+        this._post('/proxy/' + port + '/hosts', json, JSON_MIME, callback);
     },
 
     setAuthentication: function(port, domain, json, callback) {
-        this._call('POST', '/proxy/' + port + '/auth/basic/' + domain, json, callback, true);
+        if (typeof json === 'object') {
+            json = JSON.stringify(json);
+        }
+        this._post('/proxy/' + port + '/auth/basic/' + domain, json, JSON_MIME, callback);
     },
 
-    setWaitPeriod: function(port, cfg, callback) {
-        this._call('PUT', '/proxy/' + port + '/wait', parameterize(cfg), callback);
+    setWaitPeriod: function(port, params, callback) {
+        this._put('/proxy/' + port + '/wait', formEncode(params), FORM_MIME, callback);
     },
 
-    setTimeouts: function(port, cfg, callback) {
-        this._call('PUT', '/proxy/' + port + '/timeout', parameterize(cfg), callback);
+    setTimeouts: function(port, params, callback) {
+        this._put('/proxy/' + port + '/timeout', formEncode(params), FORM_MIME, callback);
     },
 
-    addURLRedirect: function(port, cfg, callback) {
-        this._call('PUT', '/proxy/' + port + '/rewrite', parameterize(cfg), callback);
+    addURLRedirect: function(port, params, callback) {
+        this._put('/proxy/' + port + '/rewrite', formEncode(params), FORM_MIME, callback);
     },
 
     removeAllURLRedirects: function(port, callback) {
-        this._call('DELETE', '/proxy/' + port + '/rewrite', null, callback);
+        this._delete('/proxy/' + port + '/rewrite', callback);
     },
 
     setRetryCount: function(port, retryCount, callback) {
-        this._call('PUT', '/proxy/' + port + '/retry', 'retryCount=' + retryCount, callback);
+        this._put('/proxy/' + port + '/retry', formEncode({'retrycount': retryCount}), FORM_MIME, callback);
     },
 
     clearDNSCache: function(port, callback) {
-        this._call('DELETE', '/proxy/' + port + '/dns/cache', null, callback);
+        this._delete('/proxy/' + port + '/dns/cache', callback);
     },
 
-    addRequestInterceptor: function(port, payload, callback) {
-        this._call('POST', '/proxy/' + port + '/interceptor/request', payload, callback);
+    addRequestInterceptor: function(port, js, callback) {
+        this._post('/proxy/' + port + '/interceptor/request', js, JAVASCRIPT_MIME, callback);
     },
 
-    addResponseInterceptor: function(port, payload, callback) {
-        this._call('POST', '/proxy/' + port + '/interceptor/response', payload, callback);
+    addResponseInterceptor: function(port, js, callback) {
+        this._post('/proxy/' + port + '/interceptor/response', js, JAVASCRIPT_MIME, callback);
     },
-    _call: function(method, url, data, callback, isJson) {
+    // INTERNAL METHODS
+    _get: function(path, callback) {
+        this._call('GET', path, callback);
+    },
+    _post: function(path, payload, mimeType, callback) {
+        this._call('POST', path, payload, mimeType, callback);
+    },
+    _put: function(path, payload, mimeType, callback) {
+        this._call('PUT', path, payload, mimeType, callback);
+    },
+    _delete: function(path, callback) {
+        this._call('DELETE', path, callback);
+    },
+    _call: function(method, url, data, mimeType, callback) {
+        if (arguments.length === 3) {
+            callback = data;
+            data = undefined;
+        }
         var self = this;
-        var contentType = isJson ? 'application/json' : 'application/x-www-form-urlencoded';
         var options = {
             host: this.host,
             port: this.port,
             method: method,
-            path: url,
-            headers: {
-                'Content-Type': contentType,
-                'Content-Length': data ? data.length : 0
-            }
+            path: url
         };
+        if (data) {
+            options.headers = {
+                'Content-Type': mimeType,
+                'Content-Length': data.length
+            };
+        }
 
         var respCallback = function(response) {
             var resp = '';
@@ -125,8 +177,13 @@ MobProxy.prototype = {
             });
 
             response.on('end', function() {
+              var err = null;
+                if (response.statusCode >= 400) {
+                  err = new Error('Error from server: ' + response.statusCode);
+                  resp = undefined;
+                }
                 if(self.debug) { console.log(resp); }
-                if(callback !== undefined) { callback(null, resp); }
+                if(callback !== undefined) { callback(err, resp); }
             });
         };
 
