@@ -4,7 +4,7 @@ var MobProxy = function(cfg) {
     this.host = (cfg && cfg.host) ? cfg.host : 'localhost';
     this.port = (cfg && cfg.port) ? cfg.port : '8080';
     this.debug = (cfg && cfg.debug) ? cfg.debug : false;
-}
+};
 
 MobProxy.prototype = {
     getProxyList: function(callback) {
@@ -106,7 +106,7 @@ MobProxy.prototype = {
 
     call: function(method, url, data, callback, isJson) {
         var self = this;
-	var contentType = isJson ? 'application/json' : 'application/x-www-form-urlencoded';
+        var contentType = isJson ? 'application/json' : 'application/x-www-form-urlencoded';
         var options = {
             host: this.host,
             port: this.port,
@@ -120,21 +120,21 @@ MobProxy.prototype = {
 
         var respCallback = function(response) {
             var resp = '';
-            response.on('data', function(chunk) { 
+            response.on('data', function(chunk) {
                 resp += chunk;
             });
 
             response.on('end', function() {
                 if(self.debug) { console.log(resp); }
-                if(callback != undefined) { callback(null, resp); }
+                if(callback !== undefined) { callback(null, resp); }
             });
-        }
+        };
 
         var request = http.request(options, respCallback);
         if(data) { request.write(data); }
         request.end();
     }
 
-}
+};
 
 module.exports = MobProxy;
