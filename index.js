@@ -1,5 +1,14 @@
 var http = require('http');
 
+function parameterize(cfg) {
+    var params = [];
+    for (var key in cfg) {
+        params.push(key + '=' + encodeURIComponent(cfg[key]));
+    }
+
+    return params.join('&');
+}
+
 var MobProxy = function(cfg) {
     this.host = (cfg && cfg.host) ? cfg.host : 'localhost';
     this.port = (cfg && cfg.port) ? cfg.port : '8080';
@@ -20,7 +29,7 @@ MobProxy.prototype = {
     },
 
     createHAR: function(port, cfg, callback) {
-        this.call('PUT', '/proxy/' + port + '/har', this.parameterize(cfg), callback);
+        this.call('PUT', '/proxy/' + port + '/har', parameterize(cfg), callback);
     },
 
     startNewPage: function(port, pageRef, callback) {
@@ -32,11 +41,11 @@ MobProxy.prototype = {
     },
 
     limit: function(port, cfg, callback) {
-        this.call('PUT', '/proxy/' + port + '/limit', this.parameterize(cfg), callback);
+        this.call('PUT', '/proxy/' + port + '/limit', parameterize(cfg), callback);
     },
 
     addURLWhiteList: function(port, cfg, callback) {
-        this.call('PUT', '/proxy/' + port + '/whitelist', this.parameterize(cfg), callback);
+        this.call('PUT', '/proxy/' + port + '/whitelist', parameterize(cfg), callback);
     },
 
     clearURLWhiteList: function(port, callback) {
@@ -44,7 +53,7 @@ MobProxy.prototype = {
     },
 
     addURLBlackList: function(port, cfg, callback) {
-        this.call('PUT', '/proxy/' + port + '/blacklist', this.parameterize(cfg), callback);
+        this.call('PUT', '/proxy/' + port + '/blacklist', parameterize(cfg), callback);
     },
 
     clearURLBlackList: function(port, callback) {
@@ -64,15 +73,15 @@ MobProxy.prototype = {
     },
 
     setWaitPeriod: function(port, cfg, callback) {
-        this.call('PUT', '/proxy/' + port + '/wait', this.parameterize(cfg), callback);
+        this.call('PUT', '/proxy/' + port + '/wait', parameterize(cfg), callback);
     },
 
     setTimeouts: function(port, cfg, callback) {
-        this.call('PUT', '/proxy/' + port + '/timeout', this.parameterize(cfg), callback);
+        this.call('PUT', '/proxy/' + port + '/timeout', parameterize(cfg), callback);
     },
 
     addURLRedirect: function(port, cfg, callback) {
-        this.call('PUT', '/proxy/' + port + '/rewrite', this.parameterize(cfg), callback);
+        this.call('PUT', '/proxy/' + port + '/rewrite', parameterize(cfg), callback);
     },
 
     removeAllURLRedirects: function(port, callback) {
@@ -94,16 +103,6 @@ MobProxy.prototype = {
     addResponseInterceptor: function(port, payload, callback) {
         this.call('POST', '/proxy/' + port + '/interceptor/response', payload, callback);
     },
-
-    parameterize: function(cfg) {
-        var params = [];
-        for(var key in cfg) {
-            params.push(key + '=' + encodeURIComponent(cfg[key]));
-        }
-
-        return params.join('&');
-    },
-
     call: function(method, url, data, callback, isJson) {
         var self = this;
         var contentType = isJson ? 'application/json' : 'application/x-www-form-urlencoded';
