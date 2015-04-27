@@ -8,7 +8,7 @@ Installation command is ```npm install browsermob-proxy-api```
 
 ## Documentation
 
-For the specifics of the REST API used by BrowserMob Proxy, please see [documentation](https://github.com/lightbody/browsermob-proxy/blob/master/README.md).
+For the specifics of the REST API used by BrowserMob Proxy, please see their [documentation](https://github.com/lightbody/browsermob-proxy/blob/master/README.md).
 
 ### Examples
 To open a port (10800) and start a new HAR:
