@@ -182,7 +182,7 @@ MobProxy.prototype = {
                   err = new Error('Error from server: ' + response.statusCode);
                   resp = undefined;
                 }
-                if(self.debug) { console.log(resp); }
+                if(self.debug && resp) { console.log(resp); }
                 if(callback !== undefined) { callback(err, resp); }
             });
         };
