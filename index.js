@@ -60,7 +60,9 @@ MobProxy.prototype = {
         this._put('/proxy/' + port + '/limit', formEncode(params), FORM_MIME, callback);
     },
 
-    limit: this.setLimit,
+    limit: function() {
+        this.setLimit.apply(this, arguments);
+    },
 
     getURLWhiteList: function(port, callback) {
         this._get('/proxy/' + port + '/whitelist', callback);
