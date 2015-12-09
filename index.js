@@ -190,7 +190,14 @@ MobProxy.prototype = {
         };
 
         var request = http.request(options, respCallback);
-        if(data) { request.write(data); }
+
+        request.on('error', function(err) {
+          if (callback !== undefined) {
+            callback(err, null);
+          }
+        });
+
+      if(data) { request.write(data); }
         request.end();
     }
 
