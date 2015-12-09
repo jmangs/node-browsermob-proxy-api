@@ -197,7 +197,7 @@ MobProxy.prototype = {
           }
         });
 
-      if(data) { request.write(data); }
+        if(data) { request.write(data); }
         request.end();
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "browsermob-proxy-api",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "NodeJS bindings for controlling a browsermob-proxy instance (creating ports, HARs, etc)",
   "main": "index.js",
   "scripts": {
