@@ -133,6 +133,16 @@ MobProxy.prototype = {
         this._delete('/proxy/' + port + '/dns/cache', callback);
     },
 
+    // LittleProxy HTTP request/response filters
+    addRequestFilter: function(port, js, callback) {
+        this._post('/proxy/' + port + '/filter/request', js, JAVASCRIPT_MIME, callback);
+    },
+
+    addResponseFilter: function(port, js, callback) {
+        this._post('/proxy/' + port + '/filter/response', js, JAVASCRIPT_MIME, callback);
+    },
+
+    // Legacy HTTP request/response filters
     addRequestInterceptor: function(port, js, callback) {
         this._post('/proxy/' + port + '/interceptor/request', js, JAVASCRIPT_MIME, callback);
     },
