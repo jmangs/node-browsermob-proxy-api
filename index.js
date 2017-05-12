@@ -1,4 +1,5 @@
 var http = require('http');
+var bytes = require('utf8-length');
 
 function formEncode(params) {
     if (!params) {
@@ -178,7 +179,7 @@ MobProxy.prototype = {
         if (data) {
             options.headers = {
                 'Content-Type': mimeType,
-                'Content-Length': data.length
+                'Content-Length': bytes(data)
             };
         }
 
